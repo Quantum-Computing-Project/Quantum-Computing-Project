@@ -7,6 +7,12 @@ import numpy as np
 
 # Define Kronecker product function for 2 matrices
 def kronecker_product(matrix1, matrix2):
+    """
+    This function takes in two matrices (or vectors) and returns a Kronecker product of the two.
+    :param matrix1: left operand
+    :param matrix2: right operand
+    :return: Kronecker product
+    """
     if not isinstance(matrix1, np.ndarray) or not isinstance(matrix2, np.ndarray):
         raise Exception('Inputed parameters are not numpy matrices!')
 
