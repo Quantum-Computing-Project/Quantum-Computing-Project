@@ -31,13 +31,15 @@ class SparseMatrix:
                         self._col_index.append(j)
                         self._row_index.append(i)
 
-            self._row_index.append(m)  # no plus 1 because matrix.shape counts from 1 and not from 0
-
     def __str__(self):
         output = ''
         for i in range(len(self._values)):
-            output += f'( {self._row_index[i]}, {self._col_index[i]} ) : {self._values[i]} \n'
+            output += f'({self._row_index[i]}, {self._col_index[i]}) : {self._values[i]} \n'
         return output
+
+    @property
+    def shape(self):
+        return self._shape
 
     def unsparse(self):
         full_matrix = np.zeros(shape=self._shape, dtype=np.complex128)
@@ -53,3 +55,4 @@ if __name__ == '__main__':
     testMatrix = SparseMatrix(np.array([[1 + 1j, 0], [0, 2]]))
     print(testMatrix)
     print(testMatrix.unsparse())
+    print(testMatrix.shape)
