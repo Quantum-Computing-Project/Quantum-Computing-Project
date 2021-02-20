@@ -14,7 +14,7 @@ def kronecker_product(matrix1, matrix2):
     :return: Kronecker product
     """
     if not isinstance(matrix1, np.ndarray) or not isinstance(matrix2, np.ndarray):
-        raise Exception('Inputed parameters are not numpy matrices!')
+        raise TypeError('Inputed parameters are not numpy matrices!')
 
     else:
         if len(matrix1.shape) == 1 and len(matrix2.shape) == 1:
@@ -23,7 +23,9 @@ def kronecker_product(matrix1, matrix2):
             (p,) = matrix2.shape
             q = 1
             # Modified algorithm
-            return np.array([matrix1[i // p] * matrix2[i % p] for j in range(n*q) for i in range(m*p)])
+            return np.array([matrix1[i // p] * matrix2[i % p] for _ in range(n*q) for i in range(m*p)])
+            # Might need to add dtype=np.complex128 to avoid losing the complex part, check later if it
+            # doesn't work correctly
 
         elif len(matrix1.shape) == 1:
             (m,) = matrix1.shape  # matrix1 is a vector, extract the length
@@ -47,26 +49,27 @@ def kronecker_product(matrix1, matrix2):
             return np.array([[matrix1[i // p][j // q] * matrix2[i % p][j % q] for j in range(n*q)] for i in range(m*p)])
 
 
+def kronecker_product_multi(*matrices):
+    """
+    Kronecker product implemented on an arbitrary number of matrices (or vectors). Make sure the matrices are
+    inputed in order in which you want to have them kronecker producted. For example A * B * C would be called as
+    kronecker_product_multi(A, B, C)
+    :param matrices:
+    :return: matrix
+    """
+    if len(matrices) < 2:
+        raise SyntaxError('Only one matrix was given, at least two are needed.')
+    else:
+        result = np.array([1])
+        for matrix in matrices:
+            result = kronecker_product(result, matrix)
+        return result
+
+
 # Do tests here
 if __name__ == "__main__":
-    a = np.array([0, 1])
+    a = np.array([0, 1, 2])
     b = np.array([0, 1])
 
     print(kronecker_product(a, b))
-
-def kronecker_product_multi(matrices):
-    matrix_num = len(matrices)
-    if matrix_num < 2:
-        print("Not enough arguments")
-
-    elif matrix_num == 2:
-        return kronecker_product(matrices)
-
-    else:
-        hd = matrices[:matrix_num - 2] #head of tuple
-        tl = matrices[matrix_num - 2:] #tail of tuple to be replaced with their kronecker product
-        print(tl)
-        return kronecker_product_multi(hd + (kronecker_product(tl[0],tl[1]),)) #fix error: kronecker_product() missing 1 required positional argument: 'matrix2'
-
-#test
-kronecker_product_multi((a,b,a))
+    print(kronecker_product_multi(a, b, b))
