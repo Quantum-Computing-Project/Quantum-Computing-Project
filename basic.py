@@ -65,6 +65,17 @@ def kronecker_product_multi(*matrices):
             result = kronecker_product(result, matrix)
         return result
 
+def kronecker_product_power(matrix, power):
+    if power < 1:
+        raise SyntaxError('Power input invalid')
+    elif power == 1:
+        return matrix
+    else:
+        i = 2
+        result = kronecker_product(matrix, matrix)
+        while i < power:
+            result = kronecker_product(result, matrix)
+        return result
 
 # Do tests here
 if __name__ == "__main__":
@@ -73,3 +84,5 @@ if __name__ == "__main__":
 
     print(kronecker_product(a, b))
     print(kronecker_product_multi(a, b, b))
+    print(kronecker_product_power(a,3))
+    print("hello")
