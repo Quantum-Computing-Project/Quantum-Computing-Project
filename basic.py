@@ -75,6 +75,7 @@ def kronecker_product_power(matrix, power):
         result = kronecker_product(matrix, matrix)
         while i < power:
             result = kronecker_product(result, matrix)
+            i = i + 1
         return result
 
 # Do tests here
@@ -84,5 +85,5 @@ if __name__ == "__main__":
 
     print(kronecker_product(a, b))
     print(kronecker_product_multi(a, b, b))
+    print(kronecker_product_multi(a, a, a))
     print(kronecker_product_power(a,3))
-    print("hello")
