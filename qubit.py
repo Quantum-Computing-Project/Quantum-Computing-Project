@@ -22,12 +22,7 @@ class Qubit(object):
 
         self.P_alpha = abs(self.norm_alpha**2)
         self.P_beta = abs(self.norm_beta**2)
-        
-        
-
-        
-    
-
+           
     def measure(self):
 
         x = random.random()
@@ -41,9 +36,6 @@ class Qubit(object):
 
         
         return measurement
-    
-    
-
 
 def main():
 
