@@ -1,6 +1,6 @@
 
 import numpy as np
-import math as m
+import math
 import random 
 
 class Qubit(object):
@@ -13,12 +13,12 @@ class Qubit(object):
         self.mag = mag
 
         
-        self.norm_alpha = self.alpha/(m.sqrt(alpha**2 + beta**2))
-        self.norm_beta = self.beta/(m.sqrt(alpha**2 + beta**2))
+        self.norm_alpha = self.alpha/(math.sqrt(alpha**2 + beta**2))
+        self.norm_beta = self.beta/(math.sqrt(alpha**2 + beta**2))
 
     
         self.vector = np.array([self.norm_alpha, self.norm_beta])
-        self.vector = np.array([m.cos(self.theta), m.sin(self.theta)])
+        self.vector = np.array([math.cos(self.theta), math.sin(self.theta)])
 
         self.P_alpha = abs(self.norm_alpha**2)
         self.P_beta = abs(self.norm_beta**2)
