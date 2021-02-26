@@ -11,12 +11,10 @@ class Qubit(object):
         self.beta = beta
         self.theta = theta
         self.mag = mag
-
-        
+ 
         self.norm_alpha = self.alpha/(math.sqrt(alpha**2 + beta**2))
         self.norm_beta = self.beta/(math.sqrt(alpha**2 + beta**2))
 
-    
         self.vector = np.array([self.norm_alpha, self.norm_beta])
         self.vector = np.array([math.cos(self.theta), math.sin(self.theta)])
 
@@ -28,13 +26,11 @@ class Qubit(object):
         x = random.random()
         
         if x <= self.P_alpha:
-                       measurement = np.array([1, 0])
+            measurement = np.array([1, 0])
         
-
         else:
             measurement = np.array([0,1])
 
-        
         return measurement
 
 def main():
