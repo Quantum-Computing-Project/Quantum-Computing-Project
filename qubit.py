@@ -14,14 +14,14 @@ class Qubit(object):
         
         # Normalised coefficients
         self.norm_alpha = alpha/(math.sqrt(abs(alpha)**2 + abs(beta)**2))
-        self.norm_beta = beta/(math.sqrt(abs(alpha)**2 + abs(beta)**2))
+        self.norm_beta = beta/(math.sqrt((abs(alpha))**2 + (abs(beta))**2))
 
         # Matrix form
         self.vector = np.array([self.norm_alpha, self.norm_beta])
 
         # Probabilities
-        self.P_alpha = abs(self.norm_alpha)**2
-        self.P_beta = abs(self.norm_beta)**2
+        self.P_alpha = (abs(self.norm_alpha))**2
+        self.P_beta = (abs(self.norm_beta))**2
         
     # Method to collapse the wave function and return |0> or |1>    
     def measure(self): 
