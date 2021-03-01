@@ -1,13 +1,17 @@
+"""
+This module contains the quantum gates
+"""
+
 
 #Quantum gates
+#0.2
 
 
-#Most of this is going to have to be reworked later
+#Some of this is going to have to be reworked later
 #I doubt these will work with the Qubit class right now.
 #The np.matmul function may have to be replaced but idk.
-#If you want to use multiple gates simultaneously, you'll have to do it 
-#manually with the help of the matrices below. We probably don't want to have 
-#to do that.
+#The CX and CZ gates may be slightly restrictive and/or fiddly. You probably
+#won't have a nice time using them.
 
 
 import numpy as np
@@ -15,118 +19,235 @@ from basic import kronecker_product
 
 #----------------------------------Constants-----------------------------------
 
-I = np.array([[1,0], [0,1]])
+I = np.array([[1,0],
+              [0,1]])
 #Identity Gate
 
-X = np.array([[0,1], [1,0]])
+X = np.array([[0,1],
+              [1,0]])
 #NOT Gate
 
-Y = np.array([[0,-1j], [1j,0]])
+Y = np.array([[0,-1j], 
+              [1j,0]])
 #Y Gate
 
-Z = np.array([[0,-1j], [1j,0]])
+Z = np.array([[0,-1j], 
+              [1j,0]])
 #Z Gate
 
-H = (1/np.sqrt(2)) * np.array([[1,1], [1,-1]])
+H = (1/np.sqrt(2)) * np.array([[1,1], 
+                               [1,-1]])
 #Hadamard Gate
 
-S = np.array([[1,0], [0,1j]])
+S = np.array([[1,0], 
+              [0,1j]])
 #Phase Gate
 
-CX = np.array([[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]])
+CX = np.array([[1,0,0,0], 
+               [0,1,0,0], 
+               [0,0,0,1], 
+               [0,0,1,0]])
 #Controlled NOT Gate
 
-CZ = np.array([[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,-1]])
+CZ = np.array([[1,0,0,0], 
+               [0,1,0,0],
+               [0,0,1,0], 
+               [0,0,0,-1]])
 #Controlled X Gate
 
-#----------------------------------Functions-----------------------------------
+SWAP = np.array([[1,0,0,0],
+                 [0,0,1,0],
+                 [0,1,0,0],
+                 [0,0,0,1]])
+#SWAP Gate
 
-def iGate(state):
-    """
-    Identity gate
-    
-    Parameters
-    ----------
-    state: array
-        state of quantum bit to be operated on
-    """
-    
-    return np.matmul(I, state)
+CCX = np.array([[1,0,0,0,0,0,0,0],
+                [0,1,0,0,0,0,0,0],
+                [0,0,1,0,0,0,0,0],
+                [0,0,0,1,0,0,0,0],
+                [0,0,0,0,1,0,0,0],
+                [0,0,0,0,0,1,0,0],
+                [0,0,0,0,0,0,0,1],
+                [0,0,0,0,0,0,1,0]])
+#Toffoli Gate
 
-def xGate(state):
-    """
-    NOT gate, single qubit operation
-    
-    Parameters
-    ----------
-    state: array
-        state of quantum bit to be operated on
-    """
-    
-    return np.matmul(X, state)  #not sure if we're allowed to use this
+#---------------------------------Base Class-----------------------------------
 
-def yGate(state):
+class QuantumGate(object):
+    
     """
-    Y gate
+    Base quantum gate class
+    
+    Parameters
+    ----------
+    matrix: array
+        matrix representing quantum gate
+    """
+    
+    def __init__(self, matrix = I):
+        
+        self.matrix = matrix
+        
+    
+    def __mul__(self, x):
+        """
+        Tensor product for quantum gates. can be called using * operator
+        
+        Parameters
+        ----------
+        x: QuantumGate
+            Other quantum gate to perform kronecker product with
+        """
 
-    Parameters
-    ----------
-    state: array
-        state of quantum bit to be operated on
-    """
+        newgate = kronecker_product(self.matrix, x.matrix)
+        return QuantumGate(newgate)
     
-    return np.matmul(Y, state)
-    
-def zGate(state):
-    """
-    Z gate
-    
-    Parameters
-    ----------
-    state: array
-        state of quantum bit to be operated on
-    """
-    
-    return np.matmul(Z, state)
-    
-def hGate(state):
-    """
-    Hadamard gate
-    
-    Parameters
-    ----------
-    state: array
-        state of quantum bit to be operated on
-    """
-    
-    return np.matmul(H, state) 
 
-def cxGate(state, control):
-    """
-    Controlled NOT gate
+    def __str__(self):
     
-    Parameters
-    ----------
-    state: array
-        state of quantum bit to be operated on
-    control: array
-        state of quantum bit to be used as a control
-    """
+        return str(self.matrix)
     
-    statevector = kronecker_product(control, state)
-    return np.matmul(CX, statevector)
+    
+    def __call__(self, statevector):
+        """
+        Applies gate to qubit(s)
+        
+        Parameters
+        ----------
+        statevector: array
+            state of quantum bit to be operated on
+        """
+        
+        return np.matmul(self.matrix, statevector)
 
-def czGate(state, control):
-    """
-    Controlled Z gate
     
-    Parameters
-    ----------
-    state: array
-        state of quantum bit to be operated on
-    control: array
-        state of quantum bit to be used as a control
+        
+#------------------------------Gate Construction-------------------------------
+
+def iGate():
+    """
+    Creates an Identity gate object when called.
+    
+    Returns
+    -------
+    QuantumGate
+        An Identity gate
     """
     
-    statevector = kronecker_product(control, state)
-    return np.matmul(CZ, statevector)
+    return QuantumGate()
+
+def xGate():
+    """
+    Creates a NOT gate object when called.
+    
+    Returns
+    -------
+    QuantumGate
+        An X gate
+    """
+    
+    return QuantumGate(X)
+
+def yGate():
+    """
+    Creates a Y gate object when called.
+    
+    Returns
+    -------
+    QuantumGate
+        A Y gate
+    """
+    
+    return QuantumGate(Y)
+    
+def zGate():
+    """
+    Creates a Z gate object when called.
+    
+    Returns
+    -------
+    QuantumGate
+        A Z gate
+    """
+    
+    return QuantumGate(Z)
+    
+def hGate():
+    """
+    Creates a Hadamard gate object when called.
+    
+    Returns
+    -------
+    QuantumGate
+        A Hadamard gate
+    """
+    
+    return QuantumGate(H) 
+
+def sGate():
+    """
+    Returns a Phase gate object when called.
+
+    Returns
+    -------
+    QuantumGate
+        A Phase gate
+
+    """
+    return QuantumGate(S)
+
+#Still trying to figure out how these ones should work with the new implementation
+# ||                                                                          ||
+# \/                                                                          \/
+
+#If you want to call these ones, you'll want to make sure that you have a
+#statevector containing both of the qubits you're using
+#(or all three in the case of the Toffoli Gate)
+
+def swapGate():
+    """
+    Creates a SWAP gate object when called.
+
+    Returns
+    -------
+    QuantumGate
+        A SWAP gate
+
+    """
+    return QuantumGate(SWAP)
+
+def cxGate():
+    """
+    Creates a Controlled NOT gate object when called.
+    
+    Returns
+    -------
+    QuantumGate
+        A CNOT gate
+    """
+
+    return QuantumGate(CX)
+
+def czGate():
+    """
+    Creates a Controlled Z gate object when called.
+    
+    Returns
+    -------
+    QuantumGate
+        A CZ gate
+    """
+    
+    return QuantumGate(CZ)
+
+def toffGate():
+    """
+    Creates a Toffoli Gate object when called.
+    
+    Returns
+    -------
+    QuantumGate
+        A Toffoli Gate
+    """
+    
+    return QuantumGate(CCX)
