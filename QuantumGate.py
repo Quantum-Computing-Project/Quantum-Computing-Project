@@ -2,13 +2,11 @@
 This module contains the quantum gates
 """
 
-
 #Quantum gates
-#0.2
+#0.3
 
 
-#Some of this is going to have to be reworked later
-#I doubt these will work with the Qubit class right now.
+#Some of this may have to be reworked later
 #The np.matmul function may have to be replaced but idk.
 #The CX and CZ gates may be slightly restrictive and/or fiddly. You probably
 #won't have a nice time using them.
@@ -16,6 +14,8 @@ This module contains the quantum gates
 
 import numpy as np
 from basic import kronecker_product
+from QuantumRegister import State
+from qubit import Qubit
 
 #----------------------------------Constants-----------------------------------
 
@@ -114,11 +114,20 @@ class QuantumGate(object):
         
         Parameters
         ----------
-        statevector: array
-            state of quantum bit to be operated on
+        statevector: array, State, Qubit
+            State of quantum bit or register
         """
         
-        return np.matmul(self.matrix, statevector)
+        #Is the gate acting on the qubit class?
+        if isinstance(statevector, Qubit):
+            output = np.matmul(self.matrix, statevector.vector)
+        #Is the gate acting on the quantum register?
+        elif isinstance(statevector, State):
+            output = np.matmul(self.matrix, statevector.state)
+        else:
+            output = np.matmul(self.matrix, statevector)
+        
+        return output
 
     
         
@@ -203,6 +212,7 @@ def sGate():
 #If you want to call these ones, you'll want to make sure that you have a
 #statevector containing both of the qubits you're using
 #(or all three in the case of the Toffoli Gate)
+#Also, make sure they're in the right order
 
 def swapGate():
     """
