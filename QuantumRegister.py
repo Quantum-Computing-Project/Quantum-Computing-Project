@@ -1,37 +1,39 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-@author: nadiyahall
-"""
-import numpy as np
-import Qubit as Q
-import basic 
-
 class State(object):
     
-    def __init__(self, qubits):
+    # Initialising state vector and number of qubits
+    def __init__(self, *arrays):
         
-        # If arg is Qubit object then state is just array with 1 qubit
-        if isinstance(qubits, Q.Qubit):
-            self.state = np.array(qubits.vector)
-            
-        # Else if args are two qubits then state is tensor product of the two
-        elif len(qubits) == 2:
-            self.state = basic.kronecker_product(qubits[0].vector, qubits[1].vector)
-            
-        # Else if there is a longer list of qubits then state is tensor product of them all
-        # This only work when you remove the * from the kronecker_delta_multi function so you can input a list
-        elif len(qubits) > 2:
-            vectors = []
-            for qubit in qubits :      
-                vectors.append(qubit.vector)
-            self.state = basic.kronecker_product_multi(vectors)
-        else:
-            raise TypeError('Inputted parameter is not qubit/list of qubits!')
-             
-x = Q.Qubit(5, 3j)
-y = Q.Qubit(7j, 2)
-k = Q.Qubit(8, 5)
+        self.vector = np.array([1])
 
-z = State(x)
-print(z.state)
+        for array in arrays:
+            self.vector = basic.kronecker_product(self.vector,array)
+
+        self.num_qubits = len(self.vector)
+
+    # Method to make random measurement 
+    def measure(self):
+        
+        P = 0
+        x = random.random()
+        i = -1
+        print("random number", x) # For testing DELETE LATER
+        
+        while P < x:
+                
+                P += (abs(self.vector[i+1]))**2      
+                i += 1
+                print("P,",i, "=",  P)   # For testing DELETE LATER 
+                
+        return i
+            
+def main(): # For testing DELETE LATER
+ 
+    y = State(np.array([1/math.sqrt(2), 1/math.sqrt(2)]),np.array([1/math.sqrt(2), 1/math.sqrt(2)]))
+    print ("qubits", y.num_qubits)
+    print("vector", y.vector)
+    
+    print(State.measure(y))
+       
+main()
