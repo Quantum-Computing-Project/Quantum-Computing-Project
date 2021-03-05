@@ -6,8 +6,8 @@ Class to create a qubit object
 import numpy as np
 import math
 import random
-import QuantumRegister as QR
-from basic import kronecker_product
+from qsimulator import QuantumRegister as QR
+from qsimulator.basic import kronecker_product
 
 
 class Qubit(object):

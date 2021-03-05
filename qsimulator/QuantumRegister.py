@@ -3,7 +3,7 @@
 
 import numpy as np
 import random
-from basic import kronecker_product
+from qsimulator.basic import kronecker_product
 
 
 class State(object):
