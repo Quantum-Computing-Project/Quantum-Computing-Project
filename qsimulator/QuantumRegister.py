@@ -3,7 +3,7 @@
 
 import numpy as np
 import random
-from qsimulator.basic import kronecker_product
+from qsimulator.basic import kronecker_product, kronecker_product_power
 
 
 class State(object):
@@ -18,8 +18,14 @@ class State(object):
         return str(self.vector)
 
     def __mul__(self, other):
+        # TODO: add the posibility of multiplication by floats and integers
         newState = kronecker_product(self.vector, other.vector)
         return State(newState)
+
+    def __pow__(self, power, modulo=None):
+        return State(kronecker_product_power(self.vector, power))
+
+    # TODO: implement __truediv__
 
     def measure(self):
 
@@ -33,6 +39,8 @@ class State(object):
 
         return i
 
+# TODO: add different ways of quickly initializing required states
+
 
 if __name__ == "__main__":
     q1 = State(np.array([1/np.sqrt(2), 1/np.sqrt(2)]))
@@ -40,5 +48,6 @@ if __name__ == "__main__":
     y = q1 * q2
     print("qubits", y.num_qubits)
     print("vector", y.vector)
+    print(q1**2)
 
     print(State.measure(y))

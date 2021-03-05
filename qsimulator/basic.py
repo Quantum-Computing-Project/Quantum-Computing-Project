@@ -9,9 +9,15 @@ import numpy as np
 def kronecker_product(matrix1, matrix2):
     """
     This function takes in two matrices (or vectors) and returns a Kronecker product of the two.
-    :param matrix1: left operand, numpy complex128 array
-    :param matrix2: right operand, numpy complex128 array
-    :return: Kronecker product, numpy complex128 array
+
+    Parameters
+    ----------
+    matrix1 -> left operand, numpy complex128 array
+    matrix2 -> right operand, numpy complex128 array
+
+    Returns
+    -------
+    matrix, kronecker product of the inputted matrices, numpy complex128 array
     """
     if not isinstance(matrix1, np.ndarray) or not isinstance(matrix2, np.ndarray):
         raise TypeError('Inputted parameters are not numpy matrices!')
@@ -55,8 +61,14 @@ def kronecker_product_multi(*matrices):
     Kronecker product implemented on an arbitrary number of matrices (or vectors). Make sure the matrices are
     inputted in order in which you want to have them kronecker producted. For example A * B * C would be called as
     kronecker_product_multi(A, B, C)
-    :param matrices:
-    :return: matrix
+
+    Parameters
+    ----------
+    matrices -> matrices that are to be kronecker producted, numpy complex128 arrays
+
+    Returns
+    -------
+    matrix -> result of the operation, numpy complex128 array
     """
     if len(matrices) < 2:
         raise SyntaxError('Only one matrix was given, at least two are needed.')
@@ -70,9 +82,15 @@ def kronecker_product_multi(*matrices):
 def kronecker_product_power(matrix, power):
     """
     A function that does the kronecker product on a matrix with itself a given amount of times.
-    :param matrix: A numpy complex128 array, matrix that is to be raised to a certain "kronecker" power.
-    :param power: Integer, specifies the "kronecker power" the matrix is to be raised to.
-    :return: Numpy complex128 array.
+
+    Parameters
+    ----------
+    matrix -> matrix that is to be raised to a certain "kronecker" power
+    power -> integer, specifies the "kronecker power" the matrix is to be raised to
+
+    Returns
+    -------
+    matrix -> result of the operation, numpy complex128 array
     """
     if power < 1 or not isinstance(power, int):
         raise SyntaxError('Power input invalid')

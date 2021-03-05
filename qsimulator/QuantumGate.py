@@ -13,7 +13,7 @@ This module contains the quantum gates
 
 
 import numpy as np
-from qsimulator.basic import kronecker_product
+from qsimulator.basic import kronecker_product, kronecker_product_power
 from qsimulator.QuantumRegister import State
 from qsimulator.qubit import Qubit
 
@@ -85,23 +85,37 @@ class QuantumGate(object):
         matrix representing quantum gate
     """
 
-    def __init__(self, matrix=I):
-
-        self.matrix = matrix
-        self.shape = matrix.shape
+    def __init__(self, matrix):
+        if isinstance(matrix, np.ndarray):
+            self.matrix = matrix
+            self.shape = matrix.shape
+        else:
+            raise Exception("Input is not a numpy array.")
 
     def __mul__(self, x):
         """
-        Tensor product for quantum gates. can be called using * operator
+        Tensor product for quantum gates. It is called using the * operator
         
         Parameters
         ----------
         x: QuantumGate
             Other quantum gate to perform kronecker product with
         """
+        if isinstance(x, QuantumGate):
+            newGate = kronecker_product(self.matrix, x.matrix)
+            return QuantumGate(newGate)
+        elif isinstance(x, (int, float, np.complex128)):
+            return QuantumGate(self.matrix * x)
 
-        newGate = kronecker_product(self.matrix, x.matrix)
-        return QuantumGate(newGate)
+    def __rmul__(self, other):
+        if isinstance(other, QuantumGate):
+            newGate = kronecker_product(self.matrix, other.matrix)
+            return QuantumGate(newGate)
+        elif isinstance(other, (int, float, np.complex128)):
+            return QuantumGate(self.matrix * other)
+
+    def __pow__(self, power, modulo=None):
+        return QuantumGate(kronecker_product_power(self.matrix, power))
 
     def __str__(self):
         return str(self.matrix)
@@ -119,6 +133,8 @@ class QuantumGate(object):
             return QuantumGate(newMatrix)
         else:
             raise Exception("Two matrices are not of the same shape.")
+
+    # TODO: implement __truediv__
 
     def __call__(self, statevector):
         """
@@ -138,9 +154,11 @@ class QuantumGate(object):
         elif isinstance(statevector, State):
             output = np.matmul(self.matrix, statevector.vector)
             return State(output)
-        else:
+        elif isinstance(statevector, QuantumGate):
             output = np.matmul(self.matrix, statevector.matrix)
             return QuantumGate(output)
+        else:
+            raise Exception("What the hell are you trying to multiply?")
 
 
 
@@ -293,4 +311,4 @@ if __name__ == "__main__":
     gate1 = QuantumGate(np.array([[0,1],[2,3]]))
     gate2 = QuantumGate(np.array([[0,1],[2,3]]))
 
-    print(gate1 - gate2)
+    print(gate1**2)
