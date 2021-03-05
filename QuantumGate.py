@@ -99,8 +99,8 @@ class QuantumGate(object):
             Other quantum gate to perform kronecker product with
         """
 
-        newgate = kronecker_product(self.matrix, x.matrix)
-        return QuantumGate(newgate)
+        newGate = kronecker_product(self.matrix, x.matrix)
+        return QuantumGate(newGate)
 
     def __str__(self):
 

@@ -18,11 +18,12 @@ def kronecker_product(matrix1, matrix2):
 
     else:
         if len(matrix1.shape) == 1 and len(matrix2.shape) == 1:
-            (m,) = matrix1.shape
+            (m,) = matrix1.shape  # matrix1 is a vector, extract the length
             n = 1
-            (p,) = matrix2.shape
+            (p,) = matrix2.shape  # matrix 2 is a vector, extract the length
             q = 1
-            # Modified algorithm
+            # Found the algorithm online, wiki page of the kronecker product
+            # It is modified to reflect the fact that we have a vector here
             return np.array([matrix1[i // p] * matrix2[i % p] for _ in range(n * q) for i in range(m * p)])
             # Might need to add dtype=np.complex128 to avoid losing the complex part, check later if it
             # doesn't work correctly
@@ -31,8 +32,7 @@ def kronecker_product(matrix1, matrix2):
             (m,) = matrix1.shape  # matrix1 is a vector, extract the length
             n = 1  # Second dimension is just 1
             (p, q) = matrix2.shape
-            # Found the algorithm online, wiki page of the kronecker product
-            # It is modified to reflect the fact that we have a vector here
+            # Modified algorithm
             return np.array([[matrix1[i // p] * matrix2[i % p][j % q] for j in range(n * q)] for i in range(m * p)])
 
         elif len(matrix2.shape) == 1:

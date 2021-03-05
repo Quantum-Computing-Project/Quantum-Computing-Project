@@ -7,6 +7,7 @@ import numpy as np
 import math
 import random
 import QuantumRegister as QR
+from basic import kronecker_product
 
 
 class Qubit(object):
@@ -32,5 +33,6 @@ class Qubit(object):
             return np.array([0, 1])
 
     # Method to return quantum register from tensor product of qubits
-    def qubit_product(self, other):
-        return QR.state(self.vector, other.vector)
+    def __mul__(self, other):
+        newState = kronecker_product(self.vector, other.vector)
+        return QR.State(newState)

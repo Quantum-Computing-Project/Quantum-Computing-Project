@@ -1,39 +1,43 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+import numpy as np
+import random
+from basic import kronecker_product
+
+
 class State(object):
-    
+
     # Initialising state vector and number of qubits
-    def __init__(self, *arrays):
-        
-        self.vector = np.array([1])
+    def __init__(self, stateArray):
 
-        for array in arrays:
-            self.vector = basic.kronecker_product(self.vector,array)
+        self.vector = stateArray
+        self.num_qubits = np.log2(len(self.vector))
 
-        self.num_qubits = len(self.vector)
+    def __mul__(self, other):
+        newState = kronecker_product(self.vector, other.vector)
+        return State(newState)
 
-    # Method to make random measurement 
     def measure(self):
-        
+
         P = 0
         x = random.random()
         i = -1
-        print("random number", x) # For testing DELETE LATER
-        
+        print("random number", x)  # For testing DELETE LATER
+
         while P < x:
-                
-                P += (abs(self.vector[i+1]))**2      
-                i += 1
-                print("P,",i, "=",  P)   # For testing DELETE LATER 
-                
+            P += (abs(self.vector[i + 1])) ** 2
+            i += 1
+            print("P,", i, "=", P)  # For testing DELETE LATER
+
         return i
-            
-def main(): # For testing DELETE LATER
- 
-    y = State(np.array([1/math.sqrt(2), 1/math.sqrt(2)]),np.array([1/math.sqrt(2), 1/math.sqrt(2)]))
-    print ("qubits", y.num_qubits)
+
+
+if __name__ == "__main__":
+    q1 = State(np.array([1/np.sqrt(2), 1/np.sqrt(2)]))
+    q2 = State(np.array([1/np.sqrt(2), 1/np.sqrt(2)]))
+    y = q1 * q2
+    print("qubits", y.num_qubits)
     print("vector", y.vector)
-    
+
     print(State.measure(y))
-       
-main()
