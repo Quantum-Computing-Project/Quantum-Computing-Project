@@ -14,6 +14,9 @@ class State(object):
         self.vector = stateArray
         self.num_qubits = np.log2(len(self.vector))
 
+    def __str__(self):
+        return str(self.vector)
+
     def __mul__(self, other):
         newState = kronecker_product(self.vector, other.vector)
         return State(newState)
@@ -23,12 +26,10 @@ class State(object):
         P = 0
         x = random.random()
         i = -1
-        print("random number", x)  # For testing DELETE LATER
 
         while P < x:
             P += (abs(self.vector[i + 1])) ** 2
             i += 1
-            print("P,", i, "=", P)  # For testing DELETE LATER
 
         return i
 

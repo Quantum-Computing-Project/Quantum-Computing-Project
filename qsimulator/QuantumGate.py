@@ -88,6 +88,7 @@ class QuantumGate(object):
     def __init__(self, matrix=I):
 
         self.matrix = matrix
+        self.shape = matrix.shape
 
     def __mul__(self, x):
         """
@@ -103,8 +104,21 @@ class QuantumGate(object):
         return QuantumGate(newGate)
 
     def __str__(self):
-
         return str(self.matrix)
+
+    def __add__(self, other):
+        if self.shape == other.shape:
+            newMatrix = self.matrix + other.matrix
+            return QuantumGate(newMatrix)
+        else:
+            raise Exception("Two matrices are not of the same shape.")
+
+    def __sub__(self, other):
+        if self.shape == other.shape:
+            newMatrix = self.matrix - other.matrix
+            return QuantumGate(newMatrix)
+        else:
+            raise Exception("Two matrices are not of the same shape.")
 
     def __call__(self, statevector):
         """
@@ -119,28 +133,34 @@ class QuantumGate(object):
         # Is the gate acting on the qubit class?
         if isinstance(statevector, Qubit):
             output = np.matmul(self.matrix, statevector.vector)
+            return State(output)
         # Is the gate acting on the quantum register?
         elif isinstance(statevector, State):
             output = np.matmul(self.matrix, statevector.vector)
+            return State(output)
         else:
-            output = np.matmul(self.matrix, statevector)
+            output = np.matmul(self.matrix, statevector.matrix)
+            return QuantumGate(output)
 
-        return output
+
 
 
 # ------------------------------Gate Construction-------------------------------
 
-def iGate():
+def iGate(d):
     """
     Creates an Identity gate object when called.
-    
+    Parameters
+    ----------
+    d -> number of qubits
+
     Returns
     -------
     QuantumGate
         An Identity gate
     """
 
-    return QuantumGate()
+    return QuantumGate(np.identity(2**d))
 
 
 def xGate():
@@ -267,3 +287,10 @@ def toffGate():
     """
 
     return QuantumGate(CCX)
+
+
+if __name__ == "__main__":
+    gate1 = QuantumGate(np.array([[0,1],[2,3]]))
+    gate2 = QuantumGate(np.array([[0,1],[2,3]]))
+
+    print(gate1 - gate2)
