@@ -180,29 +180,30 @@ class QuantumGate(object):
         else:
             raise Exception("Division can only be done with integers, floats, or complex numbers.")
 
-    def __call__(self, statevector):
+    def __call__(self, other):
         """
-        Applies gate to qubit(s)
+        Applies gate to qubit(s) or does matrix product if called upon another QuantumGate object.
         
         Parameters
         ----------
-        statevector: array, State, Qubit
-            State of quantum bit or register
+        other: array, State, Qubit, QuantumGate
+            State of quantum bit or register, or another QuantumGate object.
         """
 
         # Is the gate acting on the qubit class?
-        if isinstance(statevector, Qubit):
-            output = np.matmul(self.matrix, statevector.vector)
+        if isinstance(other, Qubit):
+            output = np.matmul(self.matrix, other.vector)
             return State(output)
         # Is the gate acting on the quantum register?
-        elif isinstance(statevector, State):
-            output = np.matmul(self.matrix, statevector.vector)
+        elif isinstance(other, State):
+            output = np.matmul(self.matrix, other.vector)
             return State(output)
-        elif isinstance(statevector, QuantumGate):
-            output = np.matmul(self.matrix, statevector.matrix)
+        # Is the gate acting on another gate?
+        elif isinstance(other, QuantumGate):
+            output = np.matmul(self.matrix, other.matrix)
             return QuantumGate(output)
         else:
-            raise Exception("What the hell are you trying to multiply?")
+            raise Exception("Unsupported object type.")
 
 
 # ------------------------------Gate Construction-------------------------------
