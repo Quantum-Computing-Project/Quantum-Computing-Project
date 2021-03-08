@@ -1,6 +1,5 @@
 import qsimulator as qs
 import numpy as np
-import random
 import time
 
 """
@@ -10,11 +9,21 @@ Once all the operations are finished, a measurement is made. If the measured sta
 constant (f(0) = f(1)). If the measure state is |1> the function is balanced (f(0) != f(1)).
 
 We use a "quantum implementation" (represented by a matrix in our code) of the function that maps
-|x>|y> to |x>|f(x) XOR y>.
+|x>|y> to |x>|f(x) XOR y>. Unfortunately this matrix has to be brute force computed because of the way our code works.
+I don't think this is a problem as any actual implementation (real world implementation) of an oracle is most
+definitely going to look nothing like the usual quantum circuit model.
 """
 
 
-def deutsch_algorithm():
+def construct_problem():
+    answers = np.random.randint(0, 2, size=2)
+
+    def f(x):
+        return answers[x]
+    return f
+
+
+def deutsch_algorithm(func):
     qubit1 = qs.State(np.array([1, 1]) / np.sqrt(2))
     qubit2 = qs.State(np.array([1, -1]) / np.sqrt(2))
 
@@ -22,17 +31,6 @@ def deutsch_algorithm():
 
     H = qs.hGate()
     I = qs.iGate(1)
-
-    def construct_problem_func():
-        answers = np.random.randint(0, 2, size=2)
-
-        def f(x):
-            return answers[x]
-        return f
-
-    func = construct_problem_func()
-    print(func(0))
-    print(func(1))
 
     # Time to create an oracle that we need
     operatorMatrix = np.zeros((4, 4))
@@ -47,10 +45,15 @@ def deutsch_algorithm():
     finalState = (H * I)(oracle(initState))
     measurement = finalState.measure() // 2  # to get the state of the leftmost bit
 
-    print('f(0): {}, f(1): {}'.format(func(0), func(1)))
-    print('f(0) == f(1): {}'.format(func(0) == func(1)))
-    print('Measurement: {}'.format(measurement))
+    return measurement
 
 
 if __name__ == "__main__":
-    deutsch_algorithm()
+    f = construct_problem()
+    parity = f(0) == f(1)
+
+    measurement = deutsch_algorithm(f)
+
+    print('f(0): {}, f(1): {}'.format(f(0), f(1)))
+    print('f(0) == f(1): {}'.format(parity))
+    print('Measurement: {}'.format(measurement))
