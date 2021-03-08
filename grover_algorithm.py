@@ -20,7 +20,7 @@ def grover_algorithm(numQubits=10):
     state = qs.equiprobable(numQubits)
 
     I = np.identity(numEntries)
-    # Random entry in the matrix is -1, this represents the unknown value of x we are looking for
+    # Random entry in the main diagonal of the matrix is -1, this represents the unknown value of x we are looking for
     randInt = random.randint(0, numEntries)
     print(f"Value of x for which the value of the function is 1 is {randInt}.")
     I[randInt][randInt] = -1
