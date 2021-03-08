@@ -75,6 +75,8 @@ CCX = np.array([[1, 0, 0, 0, 0, 0, 0, 0],
 
 # ---------------------------------Base Class-----------------------------------
 
+# TODO: implement calling and changing elements of the QuantumGate
+
 class QuantumGate(object):
     """
     Base quantum gate class
@@ -94,12 +96,18 @@ class QuantumGate(object):
 
     def __mul__(self, x):
         """
-        Tensor product for quantum gates. It is called using the * operator
+        Both the kronecker product and the element-wise regular product, depending on the type of x.
+        It is called using the * operation.
         
         Parameters
         ----------
-        x: QuantumGate
-            Other quantum gate to perform kronecker product with
+        x: QuantumGate or (int, float, np.complex128)
+            If QuantumGate -> kronecker product between the two
+            If (int, float, np.complex128) -> element-wise regular product
+
+        Returns
+        -------
+        QuantumGate object type.
         """
         if isinstance(x, QuantumGate):
             newGate = kronecker_product(self.matrix, x.matrix)
@@ -108,6 +116,10 @@ class QuantumGate(object):
             return QuantumGate(self.matrix * x)
 
     def __rmul__(self, other):
+        """
+        This is a method that is invoked when the QuantumGate object is the right operand of the * operator.
+        See QuantumGate.__mul__ to see how it is implemented.
+        """
         if isinstance(other, QuantumGate):
             newGate = kronecker_product(self.matrix, other.matrix)
             return QuantumGate(newGate)
@@ -115,12 +127,32 @@ class QuantumGate(object):
             return QuantumGate(self.matrix * other)
 
     def __pow__(self, power, modulo=None):
+        """
+        This method is invoked when the QuantumGate is raised to a certain exponent.
+        The QuantumGate is kronecker-producted with itself "power" number of times.
+        Parameters
+        ----------
+        power -> integer
+        modulo
+
+        Returns
+        -------
+        QuantumGate object type
+        """
         return QuantumGate(kronecker_product_power(self.matrix, power))
 
     def __str__(self):
+        """
+        Defines the behaviour when print(QuantumGate) is invoked.
+        """
         return str(self.matrix)
 
     def __add__(self, other):
+        """
+        Defines the behaviour when the + operator is invoked.
+        If the operators are of the same size it returns a QuantumGate whose elements are
+        sums of corresponding elements in the input matrices.
+        """
         if self.shape == other.shape:
             newMatrix = self.matrix + other.matrix
             return QuantumGate(newMatrix)
@@ -128,13 +160,25 @@ class QuantumGate(object):
             raise Exception("Two matrices are not of the same shape.")
 
     def __sub__(self, other):
+        """
+        Defines the behaviour when the - operator is invoked. See QuantumGate.__add__.
+        """
         if self.shape == other.shape:
             newMatrix = self.matrix - other.matrix
             return QuantumGate(newMatrix)
         else:
             raise Exception("Two matrices are not of the same shape.")
 
-    # TODO: implement __truediv__
+    def __truediv__(self, other):
+        """
+        Defines the behaviour when the / operator is invoked. Only supports dividing by integers, floats,
+        or np.complex128 number type.
+        Returns the QuantumGate object with division implemented element-wise.
+        """
+        if isinstance(other, (int, float, np.complex128)):
+            return QuantumGate(self.matrix / other)
+        else:
+            raise Exception("Division can only be done with integers, floats, or complex numbers.")
 
     def __call__(self, statevector):
         """
@@ -161,8 +205,6 @@ class QuantumGate(object):
             raise Exception("What the hell are you trying to multiply?")
 
 
-
-
 # ------------------------------Gate Construction-------------------------------
 
 def iGate(d):
@@ -178,7 +220,7 @@ def iGate(d):
         An Identity gate
     """
 
-    return QuantumGate(np.identity(2**d))
+    return QuantumGate(np.identity(2 ** d))
 
 
 def xGate():
@@ -308,7 +350,7 @@ def toffGate():
 
 
 if __name__ == "__main__":
-    gate1 = QuantumGate(np.array([[0,1],[2,3]]))
-    gate2 = QuantumGate(np.array([[0,1],[2,3]]))
+    gate1 = QuantumGate(np.array([[0, 1], [2, 3]]))
+    gate2 = QuantumGate(np.array([[0, 1], [2, 3]]))
 
-    print(gate1**2)
+    print(gate1 / 2)

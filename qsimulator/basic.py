@@ -6,7 +6,7 @@ import numpy as np
 
 
 # Define Kronecker product function for 2 matrices
-def kronecker_product(matrix1, matrix2):
+def kronecker_product(matrix1: np.ndarray, matrix2: np.ndarray) -> np.ndarray:
     """
     This function takes in two matrices (or vectors) and returns a Kronecker product of the two.
 

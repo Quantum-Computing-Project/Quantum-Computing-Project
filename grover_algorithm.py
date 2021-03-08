@@ -13,30 +13,32 @@ import time
 # possible answers, and find the solution with 25 applications of
 # the Grover iteration operator.
 
-# TODO: after implementing all the __add__, __mul__ and so on methods modify the algorithm to reflect that
-
 def grover_algorithm(numQubits=10):
     numEntries = 2**numQubits
 
-    q1 = qs.State(np.array([1 / np.sqrt(2), 1 / np.sqrt(2)]))
-    state = q1**numQubits
+    # Create the initial state, every coefficient is the same
+    state = qs.equiprobable(numQubits)
 
-    # Let's create an oracle with the desired state being |101>
     I = np.identity(numEntries)
-
+    # Random entry in the matrix is -1, this represents the unknown value of x we are looking for
     randInt = random.randint(0, numEntries)
-    print(randInt)
+    print(f"Value of x for which the value of the function is 1 is {randInt}.")
     I[randInt][randInt] = -1
 
     oracle = qs.QuantumGate(I)
+
+    # Reflection is the second gate we will need, the syntax looks confusing but its just to quickly create the
+    # required matrix.
     reflection = qs.QuantumGate(2 * np.ones((numEntries, numEntries))/numEntries - np.identity(numEntries))
+
+    # Finally this is the gate we will use, obtained matrix multiplying oracle and reflection gates
     grover = oracle(reflection)
 
     numIterations = np.floor(np.pi/4 * np.sqrt(numEntries))  # for some reason this returns a float
     for i in range(int(numIterations)):
         state = grover(state)
 
-    print(state.measure())
+    print(f"Measured state is the state number {state.measure()}.")
 
 
 if __name__ == "__main__":
