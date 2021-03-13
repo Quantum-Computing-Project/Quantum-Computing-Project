@@ -30,6 +30,19 @@ def construct_problem_func(numQubits, problem_type='constant'):
 
 
 def deutsch_josza_algorithm(func, d):
+    """
+    Implementation of the deutsch-josza algorithm.
+    Parameters
+    ----------
+    func -> function object that is the function we are interested in
+    d -> number of qubits to do the simulation with, function is automatically adjusted to accomodate for the
+        number of qubits
+
+    Returns
+    -------
+    integer, state that gets measured
+    """
+
     q1 = qs.State(np.array([1, 1]) / np.sqrt(2))
     q2 = qs.State(np.array([1, -1]) / np.sqrt(2))
 
