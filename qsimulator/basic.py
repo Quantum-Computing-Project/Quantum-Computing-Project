@@ -30,30 +30,32 @@ def kronecker_product(matrix1: np.ndarray, matrix2: np.ndarray) -> np.ndarray:
             q = 1
             # Found the algorithm online, wiki page of the kronecker product
             # It is modified to reflect the fact that we have a vector here
-            return np.array([matrix1[i // p] * matrix2[i % p] for _ in range(n * q) for i in range(m * p)])
-            # Might need to add dtype=np.complex128 to avoid losing the complex part, check later if it
-            # doesn't work correctly
+            return np.array([matrix1[i // p] * matrix2[i % p] for _ in range(n * q) for i in range(m * p)],
+                            dtype=np.complex128)
 
         elif len(matrix1.shape) == 1:
             (m,) = matrix1.shape  # matrix1 is a vector, extract the length
             n = 1  # Second dimension is just 1
             (p, q) = matrix2.shape
             # Modified algorithm
-            return np.array([[matrix1[i // p] * matrix2[i % p][j % q] for j in range(n * q)] for i in range(m * p)])
+            return np.array([[matrix1[i // p] * matrix2[i % p][j % q] for j in range(n * q)] for i in range(m * p)],
+                            dtype=np.complex128)
 
         elif len(matrix2.shape) == 1:
             (m, n) = matrix1.shape
             (p,) = matrix2.shape
             q = 1
             # Modified algorithm again
-            return np.array([[matrix1[i // p][j // q] * matrix2[i % p] for j in range(n * q)] for i in range(m * p)])
+            return np.array([[matrix1[i // p][j // q] * matrix2[i % p] for j in range(n * q)] for i in range(m * p)],
+                            dtype=np.complex128)
 
         else:
             (m, n) = matrix1.shape
             (p, q) = matrix2.shape
             # Original algorithm
             return np.array(
-                [[matrix1[i // p][j // q] * matrix2[i % p][j % q] for j in range(n * q)] for i in range(m * p)])
+                [[matrix1[i // p][j // q] * matrix2[i % p][j % q] for j in range(n * q)] for i in range(m * p)],
+                dtype=np.complex128)
 
 
 def kronecker_product_multi(*matrices):

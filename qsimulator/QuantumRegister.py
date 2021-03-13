@@ -175,9 +175,3 @@ def equiprobable(numQubits):
 if __name__ == "__main__":
     q1 = State(np.array([1 / np.sqrt(2), 1 / np.sqrt(2)]))
     q2 = State(np.array([1 / np.sqrt(2), 1 / np.sqrt(2)]))
-    y = q1 * q2
-    print("qubits", y.num_qubits)
-    print("vector", y.vector)
-    print(q1 ** 2)
-
-    print(State.measure(y))

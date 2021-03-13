@@ -38,11 +38,12 @@ def grover_algorithm(numQubits=10):
     for i in range(int(numIterations)):
         state = grover(state)
 
-    print(f"Measured state is the state number {state.measure()}.")
+    return state.measure()
 
 
 if __name__ == "__main__":
     time1 = time.time()
-    grover_algorithm(10)
+    measurement = grover_algorithm(10)
     time2 = time.time()
+    print(f"Measured state is the state number {measurement}.")
     print(f"Time taken was {time2 - time1} s.")

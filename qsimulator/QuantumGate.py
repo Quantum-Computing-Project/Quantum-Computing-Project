@@ -298,17 +298,38 @@ def sGate():
 # (or all three in the case of the Toffoli Gate)
 # Also, make sure they're in the right order
 
-def swapGate():
+def swapGate(numQubits, swap1, swap2):
     """
-    Creates a SWAP gate object when called.
+    Creates a swap gate that swaps qubit at the position swap1 with the qubit at the position swap2.
+
+    Parameters
+    ----------
+    numQubits -> int
+    swap1 -> int, first qubit
+    swap2 -> int, second qubit
 
     Returns
     -------
-    QuantumGate
-        A SWAP gate
-
+    QuantumGate instance, apply to the whole system and the two qubits will be swapped.
     """
+    # TODO: finish this if needed
+    numEntries = 2 ** numQubits
     return QuantumGate(SWAP)
+
+
+def QFT_operator(numQubits):
+    numStates = 2**numQubits
+    operatorMatrix = np.zeros((numStates, numStates))
+    omega = np.exp(2 * np.pi * 1j / numStates)
+    for i in range(numStates):
+        for j in range(numStates):
+            operatorMatrix[i][j] = omega ** (i * j) / np.sqrt(numStates)
+    return QuantumGate(operatorMatrix)
+
+
+def inverse_QFT_operator(numQubits):
+    QFT = QFT_operator(numQubits)
+    return QuantumGate(QFT.matrix.getH())
 
 
 def cxGate():

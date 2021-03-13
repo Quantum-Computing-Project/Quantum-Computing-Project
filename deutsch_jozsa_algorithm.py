@@ -30,7 +30,10 @@ def construct_problem_func(numQubits, problem_type='constant'):
 
 
 def deutsch_josza_algorithm(func, d):
-    initState = qs.State(np.array([1, 1]) / np.sqrt(2))**d * qs.State(np.array([1, -1]) / np.sqrt(2))
+    q1 = qs.State(np.array([1, 1]) / np.sqrt(2))
+    q2 = qs.State(np.array([1, -1]) / np.sqrt(2))
+
+    initState = q1**d * q2
 
     H = qs.hGate()
     I = qs.iGate(1)
