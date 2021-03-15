@@ -66,7 +66,6 @@ def quantum_subroutine(a, N):
     f = construct_function(a, N)
     size = len(crtState.vector)
     operatorMatrix = np.zeros((size, size))
-
     totalQubits = inputRegQubitsNum + outputRegQubitsNum
     # In order to optimize calculation times we ignore any entry in the matrix for which
     # current state is 0, meaning we can skip a lot of calculations
@@ -97,21 +96,22 @@ def quantum_subroutine(a, N):
 
     # Apply QFT
     crtState = qs.QFT_operator(inputRegQubitsNum)(crtState)
-    y = crtState.measure()
     time4 = time.time()
     print("Time to apply the QFT was {} s.".format(time4 - time3))
 
+    # Make measurement
+    y = crtState.measure()
+    print("Measured state is state number {}.".format(y))
+
     # Get the closest fraction to y/Q
-    for i in range(2, N):
-        print(y/numStates)
+    for i in range(3, N):
         frac = Fraction(y/numStates).limit_denominator(i)
-        print(frac)
 
         if frac.numerator == 0:
             return -1
 
         s = frac.denominator
-        print(s)
+        print("Guess for s is {}.".format(s))
         if abs(y/numStates - frac) < 1/(2*numStates):
             if a**s % N == 1:
                 return s
@@ -119,6 +119,8 @@ def quantum_subroutine(a, N):
                 return 2*s
             elif a**(3*s) % N == 1:
                 return 3*s
+            elif a**(4*s) % N == 1:
+                return 4*s
     return -1
 
 
@@ -140,16 +142,18 @@ def shor_algorithm(N):
         if gcd != 1:
             return gcd
         else:
-            for _ in range(4):
+            for _ in range(4):  # do some number of subroutine tries
+                print("-------------------")
                 r = quantum_subroutine(a, N)
                 if r != -1:
                     if r % 2 == 1 or a**(r/2) % N == N - 1:
                         pass
                     else:
-                        return np.gcd(a ** (r / 2) + 1, N)  # equivalently return gcd(a**(r/2)-1,N)
+                        return np.gcd(int(a ** (r / 2) + 1), N)  # equivalently return gcd(a**(r/2)-1,N)
+    return None
 
 
 if __name__ == "__main__":
     N = 15
-    factor = quantum_subroutine(11, N)
+    factor = shor_algorithm(N)
     print("One factor of the number {} is {}.".format(N, factor))
