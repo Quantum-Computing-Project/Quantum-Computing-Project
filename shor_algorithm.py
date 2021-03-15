@@ -1,9 +1,8 @@
 import qsimulator as qs
 import numpy as np
-import random
 import time
 from fractions import Fraction
-from decimal import Decimal, getcontext
+from decimal import Decimal
 
 """
 Shor's algorithm. It solves the following problem: given an integer N, find its prime factors.
@@ -53,104 +52,74 @@ def construct_function(a, N):
     return func
 
 
-def cont_frac(x, k):
-    """
-    Continued fraction algorithm, taken from the following website
-    https://www.bookofproofs.org/branches/continued-fraction-python/.
-    Parameters
-    ----------
-    x -> real number for which we are looking the continued fraction expansion
-    k -> integer, number of terms to find
-
-    Returns
-    -------
-    list, continued fraction representation
-    """
-    cf = []
-    q = int(np.floor(x))
-    cf.append(q)
-    x = x - q
-    i = 0
-    while x != 0 and i < k:
-        q = int(np.floor(1 / x))
-        cf.append(q)
-        x = 1 / x - q
-        i = i + 1
-    return cf
-
-
-def calc(contFrac, n):
-    """
-    Calculates the approximation of a number from n terms given the number's continuous fraction representation.
-    Parameters
-    ----------
-    contFrac -> list of integers that represent the continuous fraction
-    n -> number of terms to use in calculation
-
-    Returns
-    -------
-    float
-    """
-    # TODO: make sure n is less than len(contFrac)
-
-    temp = Decimal("0.0")
-
-    for ni in range(n + 1, 0, -1):
-        temp = 1 / (contFrac[ni] + temp)
-
-    return contFrac[0] + temp
-
-
 def quantum_subroutine(a, N):
-    q = np.floor(1 + 2*np.log(N)/np.log(2))  # from the inequality 2log_2(N) =< q < 1 + 2log_2(N)
-    numStates = 2**q
+    inputRegQubitsNum = int(np.floor(1 + 2*np.log(N)/np.log(2)))  # from the inequality 2log_2(N) =< q < 1 + 2log_2(N)
+    numStates = 2**inputRegQubitsNum
 
-    inputReg = qs.equiprobable(numStates)
-    outputReg = qs.zeros(q)
+    inputReg = qs.equiprobable(inputRegQubitsNum)
+
+    outputRegQubitsNum = int(np.ceil(np.log(N)/np.log(2)))
+    outputReg = qs.zeros(outputRegQubitsNum)
 
     # We need an operator that maps |a>|0>**q state to |a>|x**a mod N>**q state
     crtState = inputReg * outputReg
     f = construct_function(a, N)
     size = len(crtState.vector)
     operatorMatrix = np.zeros((size, size))
-    half = int(len(size / 2))  # used to quickly extract left bits from right bits
+
+    totalQubits = inputRegQubitsNum + outputRegQubitsNum
+    # In order to optimize calculation times we ignore any entry in the matrix for which
+    # current state is 0, meaning we can skip a lot of calculations
+    time1 = time.time()
     for i in range(size):
-        for j in range(size):
+        for j in range(0, size, 2**outputRegQubitsNum):
             binj = str(qs.decimal_to_binary(j))  # Need to manually add 0 bits to the left if j is small
-            if len(binj) != q:
-                binj = '0' * (q - len(binj)) + binj
-            inputRegBits = binj[:half]
-            outputRegBits = binj[half:]
+            if len(binj) != totalQubits:
+                binj = '0' * (totalQubits - len(binj)) + binj
+            inputRegBits = binj[:inputRegQubitsNum]
             inputRegNumber = qs.binary_to_decimal(inputRegBits)
-            functionMapBin = qs.decimal_to_binary(f(inputRegNumber))
+            functionMapBin = str(qs.decimal_to_binary(f(inputRegNumber)))
+            if len(functionMapBin) != outputRegQubitsNum:
+                functionMapBin = '0' * (outputRegQubitsNum - len(functionMapBin)) + functionMapBin
             if qs.binary_to_decimal(str(inputRegBits) + str(functionMapBin)) == i:
                 operatorMatrix[i][j] = 1
+    time2 = time.time()
+    print("Time to construct the oracle matrix was {} s.".format(time2 - time1))
 
     # Is it called an oracle??
     oracle = qs.QuantumGate(operatorMatrix)
     crtState = oracle(crtState)
+    time3 = time.time()
+    print("Time to apply the matrix was {} s.".format(time3 - time2))
 
-    # Now apply inverse QFT to the input register (combine with I gate for the output register)
-    crtState = (qs.inverse_QFT_operator(q) * qs.iGate(q))(crtState)
+    # Measure the output register
+    crtState = crtState.collapse_qubits(outputRegQubitsNum)
 
-    # Perform the measurement now
-    measurement = crtState.measure()
-    # Extract the measurement of the leftmost half bits
-    y = qs.binary_to_decimal(qs.decimal_to_binary(measurement)[:half])
+    # Apply QFT
+    crtState = qs.QFT_operator(inputRegQubitsNum)(crtState)
+    y = crtState.measure()
+    time4 = time.time()
+    print("Time to apply the QFT was {} s.".format(time4 - time3))
 
-    # Get continuous fraction representation of y/Q
-    contFracy = cont_frac(y/numStates, 20)
-    for i in range(20):
-        approximation = Fraction(calc(contFracy, i))
-        s = approximation.denominator
-        if s < N and abs(y/numStates - approximation) < 1/(2*numStates):
+    # Get the closest fraction to y/Q
+    for i in range(2, N):
+        print(y/numStates)
+        frac = Fraction(y/numStates).limit_denominator(i)
+        print(frac)
+
+        if frac.numerator == 0:
+            return -1
+
+        s = frac.denominator
+        print(s)
+        if abs(y/numStates - frac) < 1/(2*numStates):
             if a**s % N == 1:
                 return s
             elif a**(2*s) % N == 1:
                 return 2*s
             elif a**(3*s) % N == 1:
                 return 3*s
-    return None
+    return -1
 
 
 def shor_algorithm(N):
@@ -162,23 +131,25 @@ def shor_algorithm(N):
         if possibleFactor.is_integer() and N % possibleFactor == 0:
             return possibleFactor
 
-    flag = 1
-
-    while flag != 0:
+    for _ in range(20):  # do some number of guesses
         a = np.random.randint(2, N)  # low is inclusive, high is exclusive
+        print("Random guessed number is {}".format(a))
 
         gcd = np.gcd(a, N)
 
         if gcd != 1:
             return gcd
         else:
-            # TODO: fix the case of quantum_subroutine return None
-            r = quantum_subroutine(a, N)
-
-            if r % 2 == 1 or a**(r/2) % N == -1:
-                pass
-            else:
-                return np.gcd(a**(r/2) + 1, N)  # equivalently we can return the other factor gcd(a**(r/2) - 1, N)
+            for _ in range(4):
+                r = quantum_subroutine(a, N)
+                if r != -1:
+                    if r % 2 == 1 or a**(r/2) % N == N - 1:
+                        pass
+                    else:
+                        return np.gcd(a ** (r / 2) + 1, N)  # equivalently return gcd(a**(r/2)-1,N)
 
 
 if __name__ == "__main__":
+    N = 15
+    factor = quantum_subroutine(11, N)
+    print("One factor of the number {} is {}.".format(N, factor))

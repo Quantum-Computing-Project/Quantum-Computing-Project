@@ -319,7 +319,7 @@ def swapGate(numQubits, swap1, swap2):
 
 def QFT_operator(numQubits):
     numStates = 2**numQubits
-    operatorMatrix = np.zeros((numStates, numStates))
+    operatorMatrix = np.zeros((numStates, numStates), dtype=np.complex128)
     omega = np.exp(2 * np.pi * 1j / numStates)
     for i in range(numStates):
         for j in range(numStates):
@@ -329,7 +329,7 @@ def QFT_operator(numQubits):
 
 def inverse_QFT_operator(numQubits):
     QFT = QFT_operator(numQubits)
-    return QuantumGate(QFT.matrix.getH())
+    return QuantumGate(np.conjugate(QFT.matrix.T))
 
 
 def cxGate():
@@ -372,7 +372,6 @@ def toffGate():
 
 
 if __name__ == "__main__":
-    gate1 = QuantumGate(np.array([[0, 1], [2, 3]]))
-    gate2 = QuantumGate(np.array([[0, 1], [2, 3]]))
-
-    print(gate1 / 2)
+    QFT = QFT_operator(1)
+    print(QFT)
+    print(inverse_QFT_operator(1))

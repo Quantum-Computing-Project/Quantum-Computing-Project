@@ -7,6 +7,7 @@ This module contains the State class that is used to represent a state of a quan
 
 import numpy as np
 import random
+import qsimulator as qs
 from qsimulator.basic import kronecker_product, kronecker_product_power
 
 
@@ -29,7 +30,7 @@ class State(object):
         stateArray -> np.ndarray, represents the coefficients
         """
         self.vector = stateArray
-        self.num_qubits = np.log2(len(self.vector))
+        self.num_qubits = int(np.log2(len(self.vector)))
 
     def __str__(self):
         """
@@ -119,6 +120,34 @@ class State(object):
 
         return i
 
+    def collapse_qubits(self, numQubits):
+        if numQubits > self.num_qubits:
+            raise Exception("Can't measure more qubits than there are qubits in the register.")
+        else:
+            P = 0
+            x = random.random()
+            i = -1
+
+            while P < x:
+                P += (abs(self.vector[i + 1])) ** 2
+                i += 1
+            ibin = str(qs.decimal_to_binary(i))
+            if len(ibin) != self.num_qubits:
+                ibin = '0' * (self.num_qubits - len(ibin)) + ibin
+            measuredQubits = ibin[len(ibin)-numQubits:]
+            newState = []
+            for j in range(len(self.vector)):
+                binj = str(qs.decimal_to_binary(j))
+
+                if len(binj) != self.num_qubits:
+                    binj = '0' * (self.num_qubits - len(binj)) + binj
+
+                if binj[len(binj)-numQubits:] == measuredQubits:
+                    newState.append(self.vector[j])
+
+            normalized = newState / np.linalg.norm(newState)
+            return State(normalized)
+
 
 def ones(numQubits):
     """
@@ -173,5 +202,6 @@ def equiprobable(numQubits):
 
 
 if __name__ == "__main__":
-    q1 = State(np.array([1 / np.sqrt(2), 1 / np.sqrt(2)]))
-    q2 = State(np.array([1 / np.sqrt(2), 1 / np.sqrt(2)]))
+    q1 = State(np.array([1, 0, 1, 1, 0, 0, 0, 0]) / np.sqrt(3))
+    state = q1.collapse_qubits(2)
+    print(state)
