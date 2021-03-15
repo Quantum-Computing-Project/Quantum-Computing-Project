@@ -14,6 +14,7 @@ I don't think this is a problem as any actual implementation (real world impleme
 definitely going to look nothing like the usual quantum circuit model.
 """
 
+
 # Constructing random function
 def construct_problem():
     answers = np.random.randint(0, 2, size=2)
@@ -44,7 +45,7 @@ def deutsch_algorithm(func):
 
     oracle = qs.QuantumGate(operatorMatrix)
     
-    # Applying Hadmard gate to first qubit
+    # Applying Hadamard gate to first qubit
     finalState = (H * I)(oracle(initState))
     measurement = finalState.measure() // 2  # to get the state of the leftmost bit
 
