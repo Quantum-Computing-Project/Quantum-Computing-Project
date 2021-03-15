@@ -12,7 +12,7 @@ If the function is constant we should observe the state |0> (|00...000>). If the
 any other state.
 """
 
-
+# Defining function to test
 def construct_problem_func(numQubits, problem_type='constant'):
     numInputs = 2 ** numQubits
     answers = np.zeros(numInputs)
@@ -46,6 +46,7 @@ def deutsch_josza_algorithm(func, d):
     q1 = qs.State(np.array([1, 1]) / np.sqrt(2))
     q2 = qs.State(np.array([1, -1]) / np.sqrt(2))
 
+    # Equivalent to Hadamard gate applied to d bits in state |0> and final bit in state |1>
     initState = q1**d * q2
 
     H = qs.hGate()
@@ -60,8 +61,11 @@ def deutsch_josza_algorithm(func, d):
             rest = j // 2
             if 2 * rest + (func(rest) + rightBit) % 2 == i:  # 2 * rest still needed, write down if unclear
                 operatorMatrix[i][j] = 1
-
+                
+    # Creating QuantumGate object
     oracle = qs.QuantumGate(operatorMatrix)
+    
+    # Applying Hadamard gate to |0> state qubits
     finalState = (H**d * I)(oracle(initState))
     measurements = finalState.measure() // 2  # to remove the rightmost bit
     return measurements
