@@ -318,6 +318,17 @@ def swapGate(numQubits, swap1, swap2):
 
 
 def QFT_operator(numQubits):
+    """
+    Creates a quantum Fourier transform gate.
+
+    Parameters
+    ----------
+    numQubits -> int
+
+    Returns
+    -------
+    QuantumGate object
+    """
     numStates = 2**numQubits
     operatorMatrix = np.zeros((numStates, numStates), dtype=np.complex128)
     omega = np.exp(2 * np.pi * 1j / numStates)
@@ -328,6 +339,17 @@ def QFT_operator(numQubits):
 
 
 def inverse_QFT_operator(numQubits):
+    """
+    Creates an inverse quantum Fourier transform gate. It is identical to the Fourier transform gate.
+
+    Parameters
+    ----------
+    numQubits -> int
+
+    Returns
+    -------
+    QuantumGate object
+    """
     QFT = QFT_operator(numQubits)
     return QuantumGate(np.conjugate(QFT.matrix.T))
 

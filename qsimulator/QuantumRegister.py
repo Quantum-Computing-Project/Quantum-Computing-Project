@@ -121,6 +121,19 @@ class State(object):
         return i
 
     def collapse_qubits(self, numQubits):
+        """
+        Measure the state for a given number of qubits. Measures the "rightmost" qubits. For example, if the register
+        consists of 5 qubits and the parameter numQubits is assigned the number 3, 3 rightmost qubits are measured
+        and the state of the remaining 2 qubit system is returned as a State object.
+
+        Parameters
+        ----------
+        numQubits -> int
+
+        Returns
+        -------
+        State object
+        """
         if numQubits > self.num_qubits:
             raise Exception("Can't measure more qubits than there are qubits in the register.")
         else:
@@ -131,18 +144,23 @@ class State(object):
             while P < x:
                 P += (abs(self.vector[i + 1])) ** 2
                 i += 1
-            ibin = str(qs.decimal_to_binary(i))
+
+            ibin = str(qs.decimal_to_binary(i))  # binary representation of i
+
+            #  Manually add 0s to the left of the binary representation
             if len(ibin) != self.num_qubits:
                 ibin = '0' * (self.num_qubits - len(ibin)) + ibin
+
             measuredQubits = ibin[len(ibin)-numQubits:]
             newState = []
-            for j in range(len(self.vector)):
+
+            for j in range(len(self.vector)):  # Find states which correspond to the measured state
                 binj = str(qs.decimal_to_binary(j))
 
-                if len(binj) != self.num_qubits:
+                if len(binj) != self.num_qubits:  # Manual addition of 0s again
                     binj = '0' * (self.num_qubits - len(binj)) + binj
 
-                if binj[len(binj)-numQubits:] == measuredQubits:
+                if binj[len(binj)-numQubits:] == measuredQubits:  # Save the new states
                     newState.append(self.vector[j])
 
             normalized = newState / np.linalg.norm(newState)
@@ -195,6 +213,7 @@ def equiprobable(numQubits):
     -------
     State object
     """
+
     # The same can be done using Hadamard gates, I see no reason in doing so because this is a simulation
     # after all.
     qubit = State(np.array([1 / np.sqrt(2), 1 / np.sqrt(2)]))

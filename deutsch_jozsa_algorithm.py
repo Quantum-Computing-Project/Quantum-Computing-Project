@@ -12,6 +12,7 @@ If the function is constant we should observe the state |0> (|00...000>). If the
 any other state.
 """
 
+
 # Defining function to test
 def construct_problem_func(numQubits, problem_type='constant'):
     numInputs = 2 ** numQubits
@@ -35,7 +36,7 @@ def deutsch_josza_algorithm(func, d):
     Parameters
     ----------
     func -> function object that is the function we are interested in
-    d -> number of qubits to do the simulation with, function is automatically adjusted to accomodate for the
+    d -> number of qubits to do the simulation with, function is automatically adjusted to accommodate for the
         number of qubits
 
     Returns
