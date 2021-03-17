@@ -2,7 +2,6 @@ import qsimulator as qs
 import numpy as np
 import time
 from fractions import Fraction
-from decimal import Decimal
 
 """
 Shor's algorithm. It solves the following problem: given an integer N, find its prime factors.
@@ -67,6 +66,7 @@ def quantum_subroutine(a, N):
     size = len(crtState.vector)
     operatorMatrix = np.zeros((size, size))
     totalQubits = inputRegQubitsNum + outputRegQubitsNum
+
     # In order to optimize calculation times we ignore any entry in the matrix for which
     # current state is 0, meaning we can skip a lot of calculations
     time1 = time.time()
@@ -121,6 +121,8 @@ def quantum_subroutine(a, N):
                 return 3*s
             elif a**(4*s) % N == 1:
                 return 4*s
+            elif a**(5*s) % N == 1:
+                return 5*s
     return -1
 
 
@@ -155,5 +157,8 @@ def shor_algorithm(N):
 
 if __name__ == "__main__":
     N = 15
+    time1 = time.time()
     factor = shor_algorithm(N)
+    time2 = time.time()
     print("One factor of the number {} is {}.".format(N, factor))
+    print("Time taken for the whole algorithm to run was {} s.".format(time2 - time1))
